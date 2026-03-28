@@ -96,6 +96,7 @@ class AuditAction(str, enum.Enum):
     PAYMENT_AUTHORIZED = "payment_authorized"
     PAYMENT_CAPTURED = "payment_captured"
     PAYMENT_SETTLED = "payment_settled"
+    PAYMENT_DECLINED = "payment_declined"
     PAYMENT_VOIDED = "payment_voided"
     REFUND_INITIATED = "refund_initiated"
     REFUND_PROCESSED = "refund_processed"

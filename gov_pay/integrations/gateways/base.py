@@ -8,17 +8,15 @@ from typing import Optional
 
 @dataclass
 class GatewayChargeRequest:
-    """Standardized charge request for all gateways."""
+    """Standardized charge request for all gateways.
+
+    PCI DSS: Only tokenized payment methods are accepted. Raw card numbers,
+    CVVs, and full account numbers must NEVER pass through application code.
+    Use client-side tokenization (Stripe Elements, Accept.js) to obtain tokens.
+    """
     amount: Decimal
     currency: str = "USD"
     payment_method_token: str = ""  # Tokenized card/ACH from client-side
-    card_number: str = ""  # Only used for server-side (PCI-compliant environments)
-    card_exp_month: int = 0
-    card_exp_year: int = 0
-    card_cvv: str = ""
-    ach_routing_number: str = ""
-    ach_account_number: str = ""
-    ach_account_type: str = "checking"
     payer_name: str = ""
     payer_email: str = ""
     description: str = ""
@@ -39,7 +37,6 @@ class GatewayResponse:
     response_code: str = ""
     response_message: str = ""
     avs_result: str = ""
-    cvv_result: str = ""
     raw_response: dict = None
 
     def __post_init__(self):

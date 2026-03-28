@@ -21,6 +21,15 @@ class TestGatewayDataClasses:
         assert req.metadata == {}
         assert req.payment_method_token == ""
 
+    def test_charge_request_has_no_raw_card_fields(self):
+        """PCI DSS F1: GatewayChargeRequest must not have raw card/CVV fields."""
+        req = GatewayChargeRequest(amount=Decimal("100.00"))
+        assert not hasattr(req, "card_number")
+        assert not hasattr(req, "card_cvv")
+        assert not hasattr(req, "card_exp_month")
+        assert not hasattr(req, "card_exp_year")
+        assert not hasattr(req, "ach_account_number")
+
     def test_gateway_response_defaults(self):
         resp = GatewayResponse(success=True)
         assert resp.transaction_id == ""

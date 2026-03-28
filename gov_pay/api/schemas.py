@@ -25,9 +25,17 @@ class PaymentRequest(BaseModel):
     erm_document_type: Optional[str] = Field(None, description="Document type in ERM (recording, filing, etc.)")
     card_brand: Optional[str] = None
     card_last_four: Optional[str] = Field(None, max_length=4)
-    ach_routing_number: Optional[str] = None
+    ach_routing_last_four: Optional[str] = Field(None, max_length=4, description="Last 4 digits of routing number only")
     ach_account_last_four: Optional[str] = Field(None, max_length=4)
     metadata: Optional[dict] = None
+
+    @field_validator("payment_method")
+    @classmethod
+    def validate_payment_method(cls, v):
+        valid = {"credit_card", "debit_card", "ach", "echeck", "cash", "check", "money_order"}
+        if v not in valid:
+            raise ValueError(f"payment_method must be one of {valid}")
+        return v
 
 
 class PaymentResponse(BaseModel):

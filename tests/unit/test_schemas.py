@@ -79,6 +79,29 @@ class TestPaymentRequestValidation:
                 card_last_four="42424",
             )
 
+    def test_invalid_payment_method_rejected(self):
+        """F10: payment_method must be from allowed set."""
+        with pytest.raises(ValidationError):
+            PaymentRequest(
+                entity_id=uuid4(),
+                payment_method="bitcoin",
+                subtotal=Decimal("50.00"),
+                payer_name="Test",
+                payment_method_token="tok",
+            )
+
+    def test_all_valid_payment_methods(self):
+        """All documented payment methods are accepted."""
+        for method in ["credit_card", "debit_card", "ach", "echeck", "cash", "check", "money_order"]:
+            req = PaymentRequest(
+                entity_id=uuid4(),
+                payment_method=method,
+                subtotal=Decimal("50.00"),
+                payer_name="Test",
+                payment_method_token="tok",
+            )
+            assert req.payment_method == method
+
 
 class TestVoidRequestValidation:
     def test_valid_void_request(self):
