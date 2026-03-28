@@ -3,9 +3,12 @@
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from gov_pay import __version__
 from gov_pay.api.routes import entities, erm, payments, reports
@@ -50,7 +53,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routes
+# Static files for UI
+ui_dir = Path(__file__).parent / "ui"
+app.mount("/static", StaticFiles(directory=str(ui_dir / "static")), name="static")
+
+# Register API routes
 app.include_router(payments.router, prefix=settings.api_prefix)
 app.include_router(entities.router, prefix=settings.api_prefix)
 app.include_router(reports.router, prefix=settings.api_prefix)
@@ -67,12 +74,8 @@ async def health_check():
     }
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    """Root endpoint with API information."""
-    return {
-        "name": settings.app_name,
-        "version": __version__,
-        "docs": f"{settings.api_prefix}/docs",
-        "health": f"{settings.api_prefix}/health",
-    }
+    """Serve the county admin UI."""
+    html_path = ui_dir / "templates" / "index.html"
+    return HTMLResponse(content=html_path.read_text())
