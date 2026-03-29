@@ -63,11 +63,12 @@ class CardBrand(str, enum.Enum):
 
 class GatewayProvider(str, enum.Enum):
     """Supported payment gateway providers."""
+    # Platform-managed (credentials from app settings)
     STRIPE = "stripe"
     AUTHORIZE_NET = "authorize_net"
-    PAYPAL = "paypal"
-    GOVPAY = "govpay"
-    NIC = "nic"
+    # BYOM — Bring Your Own Merchant (credentials from entity config)
+    WORLDPAY = "worldpay"
+    HOSTED_PAYMENT_PAGE = "hosted_payment_page"
 
 
 class ERMSystem(str, enum.Enum):
@@ -96,6 +97,7 @@ class AuditAction(str, enum.Enum):
     PAYMENT_AUTHORIZED = "payment_authorized"
     PAYMENT_CAPTURED = "payment_captured"
     PAYMENT_SETTLED = "payment_settled"
+    PAYMENT_DECLINED = "payment_declined"
     PAYMENT_VOIDED = "payment_voided"
     REFUND_INITIATED = "refund_initiated"
     REFUND_PROCESSED = "refund_processed"

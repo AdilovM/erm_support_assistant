@@ -25,9 +25,17 @@ class PaymentRequest(BaseModel):
     erm_document_type: Optional[str] = Field(None, description="Document type in ERM (recording, filing, etc.)")
     card_brand: Optional[str] = None
     card_last_four: Optional[str] = Field(None, max_length=4)
-    ach_routing_number: Optional[str] = None
+    ach_routing_last_four: Optional[str] = Field(None, max_length=4, description="Last 4 digits of routing number only")
     ach_account_last_four: Optional[str] = Field(None, max_length=4)
     metadata: Optional[dict] = None
+
+    @field_validator("payment_method")
+    @classmethod
+    def validate_payment_method(cls, v):
+        valid = {"credit_card", "debit_card", "ach", "echeck", "cash", "check", "money_order"}
+        if v not in valid:
+            raise ValueError(f"payment_method must be one of {valid}")
+        return v
 
 
 class PaymentResponse(BaseModel):
@@ -100,8 +108,9 @@ class EntityCreateRequest(BaseModel):
     contact_phone: Optional[str] = None
     erm_system: Optional[str] = Field(None, description="tyler_tech_recorder, tyler_tech_eagle, generic")
     erm_config: Optional[dict] = Field(None, description="ERM-specific configuration")
-    gateway_provider: str = Field("stripe", description="stripe, authorize_net")
+    gateway_provider: str = Field("worldpay", description="worldpay, hosted_payment_page, stripe, authorize_net")
     gateway_merchant_id: Optional[str] = None
+    gateway_config: Optional[dict] = Field(None, description="BYOM gateway credentials (merchant_id, api_key, etc.)")
 
     @field_validator("entity_level")
     @classmethod

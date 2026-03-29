@@ -10,6 +10,16 @@ from gov_pay.integrations.gateways.base import (
     PaymentGateway,
 )
 
+# Fields to strip from raw gateway responses (PCI DSS F14)
+_SENSITIVE_FIELDS = {"card", "source", "payment_method_details", "customer", "token"}
+
+
+def _sanitize_response(raw: dict) -> dict:
+    """Remove sensitive fields from gateway response before storage."""
+    if not isinstance(raw, dict):
+        return {}
+    return {k: v for k, v in raw.items() if k not in _SENSITIVE_FIELDS}
+
 
 class StripeGateway(PaymentGateway):
     """Stripe payment gateway integration.
@@ -49,7 +59,7 @@ class StripeGateway(PaymentGateway):
                 authorization_code=intent.get("latest_charge", ""),
                 response_code=intent.status,
                 response_message=f"PaymentIntent {intent.status}",
-                raw_response=dict(intent),
+                raw_response=_sanitize_response(dict(intent)),
             )
         except stripe.error.StripeError as e:
             return GatewayResponse(
@@ -71,7 +81,7 @@ class StripeGateway(PaymentGateway):
                 transaction_id=intent.id,
                 response_code=intent.status,
                 response_message=f"Captured {amount}",
-                raw_response=dict(intent),
+                raw_response=_sanitize_response(dict(intent)),
             )
         except stripe.error.StripeError as e:
             return GatewayResponse(
@@ -98,7 +108,7 @@ class StripeGateway(PaymentGateway):
                 authorization_code=intent.get("latest_charge", ""),
                 response_code=intent.status,
                 response_message=f"PaymentIntent {intent.status}",
-                raw_response=dict(intent),
+                raw_response=_sanitize_response(dict(intent)),
             )
         except stripe.error.StripeError as e:
             return GatewayResponse(
@@ -116,7 +126,7 @@ class StripeGateway(PaymentGateway):
                 transaction_id=intent.id,
                 response_code=intent.status,
                 response_message="Transaction voided (canceled)",
-                raw_response=dict(intent),
+                raw_response=_sanitize_response(dict(intent)),
             )
         except stripe.error.StripeError as e:
             return GatewayResponse(
@@ -139,7 +149,7 @@ class StripeGateway(PaymentGateway):
                 transaction_id=refund.id,
                 response_code=refund.status,
                 response_message=f"Refund {refund.status}",
-                raw_response=dict(refund),
+                raw_response=_sanitize_response(dict(refund)),
             )
         except stripe.error.StripeError as e:
             return GatewayResponse(
@@ -157,7 +167,7 @@ class StripeGateway(PaymentGateway):
                 transaction_id=intent.id,
                 response_code=intent.status,
                 response_message=f"PaymentIntent {intent.status}",
-                raw_response=dict(intent),
+                raw_response=_sanitize_response(dict(intent)),
             )
         except stripe.error.StripeError as e:
             return GatewayResponse(

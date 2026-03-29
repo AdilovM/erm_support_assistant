@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Payment System — County Admin</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     Top Navigation
+     ═══════════════════════════════════════════════════════ -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+        </svg>
+        GovPay
+    </a>
+    <ul class="navbar-nav">
+        <li><a href="/" class="active">Transactions</a></li>
+        <li><a href="#">Reports</a></li>
+        <li><a href="#">Entities</a></li>
+        <li><a href="#">Fee Schedules</a></li>
+    </ul>
+    <div class="navbar-entity">
+        <span>Washington County Recorder</span>
+        <span class="entity-badge">COUNTY</span>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <!-- ═══════════════════════════════════════════════════
+         Page Header
+         ═══════════════════════════════════════════════════ -->
+    <div class="page-header">
+        <div>
+            <div class="breadcrumb">
+                <a href="/">Dashboard</a>
+                <span>/</span>
+                <span>Transactions</span>
+            </div>
+            <h1>Transaction Management</h1>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         Search & Filters
+         ═══════════════════════════════════════════════════ -->
+    <div class="search-card">
+        <div class="search-row">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text" id="search-query" placeholder="Transaction #, payer name, or ERM reference...">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="filter-status">
+                    <option value="">All Statuses</option>
+                    <option value="captured">Captured</option>
+                    <option value="settled">Settled</option>
+                    <option value="authorized">Authorized</option>
+                    <option value="voided">Voided</option>
+                    <option value="refunded">Refunded</option>
+                    <option value="partially_refunded">Partially Refunded</option>
+                    <option value="declined">Declined</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select id="filter-method">
+                    <option value="">All Methods</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="debit_card">Debit Card</option>
+                    <option value="ach">ACH</option>
+                    <option value="echeck">eCheck</option>
+                    <option value="cash">Cash</option>
+                    <option value="check">Check</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="searchTransactions()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                Search
+            </button>
+        </div>
+        <div class="search-row filters">
+            <div class="form-group">
+                <label>Date From</label>
+                <input type="date" id="filter-date-from">
+            </div>
+            <div class="form-group">
+                <label>Date To</label>
+                <input type="date" id="filter-date-to">
+            </div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         Transaction Table
+         ═══════════════════════════════════════════════════ -->
+    <div class="table-card">
+        <div class="table-header">
+            <h2>Transactions</h2>
+            <span class="result-count" id="result-count">Search to view transactions</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction #</th>
+                    <th>Payer</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>ERM Ref</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="txn-table-body">
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <h3>Search for transactions</h3>
+                            <p>Use the search bar above to find transactions by payer name, transaction number, or ERM reference</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Transaction Detail Slide-out Panel
+     ═══════════════════════════════════════════════════════ -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+        <div>
+            <div style="font-size:12px;color:var(--gray-500);margin-bottom:2px">TRANSACTION</div>
+            <h2 id="detail-txn-number">—</h2>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+            <span class="badge" id="detail-status-badge"></span>
+            <button class="btn-icon" onclick="closeDetail()" title="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="detail-body" id="detail-body">
+        <!-- Populated by JS -->
+    </div>
+    <div class="detail-actions" id="detail-actions">
+        <!-- Populated by JS -->
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Void Modal
+     ═══════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="void-modal">
+    <div class="modal">
+        <div class="modal-header void-header">
+            <h3>Void Transaction</h3>
+            <button class="btn-icon" onclick="closeVoidModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-warning">
+                <span class="alert-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </span>
+                <div>
+                    <strong>This action cannot be undone.</strong> Voiding cancels the entire transaction
+                    and releases the hold on the payer's account. The funds will not be captured.
+                </div>
+            </div>
+
+            <div class="confirm-summary">
+                <div class="confirm-row">
+                    <span class="label">Transaction</span>
+                    <span class="value" id="void-txn-number">—</span>
+                </div>
+                <div class="confirm-row">
+                    <span class="label">Payer</span>
+                    <span class="value" id="void-payer">—</span>
+                </div>
+                <div class="confirm-row">
+                    <span class="label">Amount to Void</span>
+                    <span class="value" style="color:var(--danger)" id="void-amount">—</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Reason for Void <span style="color:var(--danger)">*</span></label>
+                <textarea id="void-reason" placeholder="Enter the reason for voiding this transaction (required)..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeVoidModal()">Cancel</button>
+            <button class="btn btn-danger" id="void-confirm-btn" onclick="confirmVoid()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>
+                </svg>
+                Void Transaction
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Refund Modal
+     ═══════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="refund-modal">
+    <div class="modal">
+        <div class="modal-header refund-header">
+            <h3>Process Refund</h3>
+            <button class="btn-icon" onclick="closeRefundModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-info">
+                <span class="alert-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                </span>
+                <div>
+                    Transaction <strong id="refund-txn-number">—</strong>.
+                    Maximum refundable amount: <strong id="refund-max-amount">—</strong>
+                </div>
+            </div>
+
+            <!-- Refund summary from original txn -->
+            <div class="confirm-summary" style="margin-bottom:16px">
+                <div class="confirm-row">
+                    <span class="label">Original Amount</span>
+                    <span class="value" id="refund-original-amount">—</span>
+                </div>
+                <div class="confirm-row" id="refund-already-row" style="color:var(--danger)">
+                    <span class="label">Already Refunded</span>
+                    <span class="value" id="refund-already-refunded">—</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Refund Amount <span style="color:var(--danger)">*</span></label>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <input type="number" id="refund-amount" step="0.01" min="0.01" style="flex:1">
+                    <button class="btn btn-sm btn-outline" id="refund-full-btn">Full Refund</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Reason for Refund <span style="color:var(--danger)">*</span></label>
+                <textarea id="refund-reason" placeholder="Enter the reason for this refund (required)..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="refund-fees-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Also refund convenience fees (proportional)</span>
+                </div>
+            </div>
+
+            <!-- Refund Calculation Summary -->
+            <div class="confirm-summary" style="background:#fffbeb;border-color:#fcd34d">
+                <div class="confirm-row">
+                    <span class="label">Refund Amount</span>
+                    <span class="value" id="refund-summary-amount">$0.00</span>
+                </div>
+                <div class="confirm-row" id="refund-fee-row" style="display:none">
+                    <span class="label">Fee Refund</span>
+                    <span class="value" id="refund-summary-fee">$0.00</span>
+                </div>
+                <div class="confirm-row" style="border-top:2px solid #fcd34d;margin-top:8px;padding-top:8px;font-weight:700">
+                    <span>Total Refund to Payer</span>
+                    <span id="refund-summary-total">$0.00</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeRefundModal()">Cancel</button>
+            <button class="btn btn-warning" id="refund-confirm-btn" onclick="confirmRefund()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 10h10a5 5 0 0 1 0 10H9M3 10l4-4M3 10l4 4"/>
+                </svg>
+                Process Refund
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -12,6 +12,7 @@ from gov_pay.api.schemas import (
     PaymentResponse,
     RefundRequest,
     RefundResponse,
+    TransactionSearchRequest,
     VoidRequest,
     VoidResponse,
 )
@@ -137,13 +138,11 @@ async def get_transaction(
 
 @router.post("/search")
 async def search_transactions(
-    payload: dict,
+    search: TransactionSearchRequest,
     api_key: str = Depends(verify_api_key),
     service: PaymentService = Depends(_get_payment_service),
 ):
     """Search transactions with filters."""
-    from gov_pay.api.schemas import TransactionSearchRequest
-    search = TransactionSearchRequest(**payload)
     return await service.search_transactions(
         entity_id=search.entity_id,
         status=search.status,

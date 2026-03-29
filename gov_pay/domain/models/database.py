@@ -36,8 +36,9 @@ class GovernmentEntity(Base):
     contact_phone = Column(String(20), nullable=True)
     erm_system = Column(String(50), nullable=True)
     erm_config = Column(Text, nullable=True)  # JSON configuration for ERM integration
-    gateway_provider = Column(String(50), nullable=False, default="stripe")
+    gateway_provider = Column(String(50), nullable=False, default="worldpay")
     gateway_merchant_id = Column(String(255), nullable=True)
+    gateway_config = Column(Text, nullable=True)  # JSON: BYOM gateway credentials (encrypted at rest)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -96,7 +97,7 @@ class Transaction(Base):
     payment_method = Column(String(20), nullable=False)
     card_brand = Column(String(20), nullable=True)
     card_last_four = Column(String(4), nullable=True)
-    ach_routing_number = Column(String(9), nullable=True)  # Masked/partial
+    ach_routing_number = Column(String(4), nullable=True)  # Last 4 digits only (PCI/31 CFR)
     ach_account_last_four = Column(String(4), nullable=True)
 
     # Amounts

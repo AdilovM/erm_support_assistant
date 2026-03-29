@@ -43,14 +43,18 @@ class AppSettings(BaseSettings):
     app_name: str = "Government Payment System"
     debug: bool = False
     api_prefix: str = "/api/v1"
-    allowed_origins: str = "*"
+    allowed_origins: str = "http://localhost:8000"
     log_level: str = "INFO"
 
     # Security
     api_key_header: str = "X-API-Key"
-    jwt_secret: str = "change-me-in-production"
+    jwt_secret: str = ""  # REQUIRED — must be set via APP_JWT_SECRET env var
     jwt_algorithm: str = "HS256"
     jwt_expiry_minutes: int = 60
+
+    # API keys — comma-separated list of valid keys for bootstrapping
+    # In production, use database-backed API key management
+    api_keys: str = ""  # e.g., "key1,key2,key3"
 
     # Transaction settings
     transaction_number_prefix: str = "GOV"

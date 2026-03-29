@@ -132,7 +132,7 @@ class PaymentService:
         await self.db.flush()  # Get the transaction ID
 
         # 4. Charge via gateway
-        gateway = GatewayFactory.create(entity.gateway_provider, self.settings)
+        gateway = GatewayFactory.create(entity.gateway_provider, self.settings, entity.gateway_config)
         charge_request = GatewayChargeRequest(
             amount=total_amount,
             payment_method_token=payment_method_token,
@@ -159,7 +159,7 @@ class PaymentService:
 
         # 6. Audit log
         await self._log_audit(
-            action=AuditAction.PAYMENT_CAPTURED if gateway_response.success else AuditAction.PAYMENT_INITIATED,
+            action=AuditAction.PAYMENT_CAPTURED if gateway_response.success else AuditAction.PAYMENT_DECLINED,
             actor=actor,
             transaction_id=transaction.id,
             entity_id=entity_id,
@@ -221,7 +221,7 @@ class PaymentService:
 
         # Process void via gateway
         entity = await self._get_entity(transaction.entity_id)
-        gateway = GatewayFactory.create(entity.gateway_provider, self.settings)
+        gateway = GatewayFactory.create(entity.gateway_provider, self.settings, entity.gateway_config)
         gateway_response = await gateway.void(
             transaction.gateway_transaction_id,
             merchant_id=entity.gateway_merchant_id or "",
@@ -324,7 +324,7 @@ class PaymentService:
 
         # Process via gateway
         entity = await self._get_entity(transaction.entity_id)
-        gateway = GatewayFactory.create(entity.gateway_provider, self.settings)
+        gateway = GatewayFactory.create(entity.gateway_provider, self.settings, entity.gateway_config)
         refund_request = GatewayRefundRequest(
             original_transaction_id=transaction.gateway_transaction_id,
             amount=total_refund_amount,
@@ -455,7 +455,9 @@ class PaymentService:
         if erm_reference_id:
             query = query.where(Transaction.erm_reference_id == erm_reference_id)
         if payer_name:
-            query = query.where(Transaction.payer_name.ilike(f"%{payer_name}%"))
+            # Escape SQL wildcard characters to prevent wildcard injection (F5)
+            safe_name = payer_name.replace("%", r"\%").replace("_", r"\_")
+            query = query.where(Transaction.payer_name.ilike(f"%{safe_name}%"))
         if date_from:
             query = query.where(Transaction.created_at >= date_from)
         if date_to:

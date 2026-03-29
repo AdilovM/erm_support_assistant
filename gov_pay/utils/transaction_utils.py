@@ -28,14 +28,15 @@ def generate_batch_id(entity_id: str) -> str:
 
 
 def mask_card_number(card_number: str) -> str:
-    """Return last 4 digits of card number."""
-    if len(card_number) >= 4:
+    """Return last 4 digits only. Rejects full card numbers > 4 digits
+    as they should never reach application code (PCI DSS F16)."""
+    if len(card_number) > 4:
         return card_number[-4:]
     return card_number
 
 
 def mask_account_number(account_number: str) -> str:
     """Return last 4 digits of account number."""
-    if len(account_number) >= 4:
+    if len(account_number) > 4:
         return account_number[-4:]
     return account_number
