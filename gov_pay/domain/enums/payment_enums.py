@@ -63,11 +63,12 @@ class CardBrand(str, enum.Enum):
 
 class GatewayProvider(str, enum.Enum):
     """Supported payment gateway providers."""
+    # Platform-managed (credentials from app settings)
     STRIPE = "stripe"
     AUTHORIZE_NET = "authorize_net"
-    PAYPAL = "paypal"
-    GOVPAY = "govpay"
-    NIC = "nic"
+    # BYOM — Bring Your Own Merchant (credentials from entity config)
+    WORLDPAY = "worldpay"
+    HOSTED_PAYMENT_PAGE = "hosted_payment_page"
 
 
 class ERMSystem(str, enum.Enum):

@@ -108,8 +108,9 @@ class EntityCreateRequest(BaseModel):
     contact_phone: Optional[str] = None
     erm_system: Optional[str] = Field(None, description="tyler_tech_recorder, tyler_tech_eagle, generic")
     erm_config: Optional[dict] = Field(None, description="ERM-specific configuration")
-    gateway_provider: str = Field("stripe", description="stripe, authorize_net")
+    gateway_provider: str = Field("worldpay", description="worldpay, hosted_payment_page, stripe, authorize_net")
     gateway_merchant_id: Optional[str] = None
+    gateway_config: Optional[dict] = Field(None, description="BYOM gateway credentials (merchant_id, api_key, etc.)")
 
     @field_validator("entity_level")
     @classmethod

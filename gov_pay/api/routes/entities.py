@@ -40,6 +40,7 @@ async def create_entity(
         erm_config=json.dumps(payload.erm_config) if payload.erm_config else None,
         gateway_provider=payload.gateway_provider,
         gateway_merchant_id=payload.gateway_merchant_id,
+        gateway_config=json.dumps(payload.gateway_config) if payload.gateway_config else None,
     )
     db.add(entity)
     await db.flush()

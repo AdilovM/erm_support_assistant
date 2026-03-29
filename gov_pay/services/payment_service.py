@@ -132,7 +132,7 @@ class PaymentService:
         await self.db.flush()  # Get the transaction ID
 
         # 4. Charge via gateway
-        gateway = GatewayFactory.create(entity.gateway_provider, self.settings)
+        gateway = GatewayFactory.create(entity.gateway_provider, self.settings, entity.gateway_config)
         charge_request = GatewayChargeRequest(
             amount=total_amount,
             payment_method_token=payment_method_token,
@@ -221,7 +221,7 @@ class PaymentService:
 
         # Process void via gateway
         entity = await self._get_entity(transaction.entity_id)
-        gateway = GatewayFactory.create(entity.gateway_provider, self.settings)
+        gateway = GatewayFactory.create(entity.gateway_provider, self.settings, entity.gateway_config)
         gateway_response = await gateway.void(
             transaction.gateway_transaction_id,
             merchant_id=entity.gateway_merchant_id or "",
@@ -324,7 +324,7 @@ class PaymentService:
 
         # Process via gateway
         entity = await self._get_entity(transaction.entity_id)
-        gateway = GatewayFactory.create(entity.gateway_provider, self.settings)
+        gateway = GatewayFactory.create(entity.gateway_provider, self.settings, entity.gateway_config)
         refund_request = GatewayRefundRequest(
             original_transaction_id=transaction.gateway_transaction_id,
             amount=total_refund_amount,
