@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tirithel - AI Support UI Learning</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Tirithel</h1>
+            <p class="subtitle">One Who Watches Far &mdash; AI Support UI Learning Tool</p>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab active" data-tab="guidance">Ask for Help</button>
+        <button class="tab" data-tab="sessions">Sessions</button>
+        <button class="tab" data-tab="knowledge">Knowledge Base</button>
+        <button class="tab" data-tab="profiles">Software Profiles</button>
+    </nav>
+
+    <main>
+        <!-- Ask for Help Tab -->
+        <section id="guidance" class="tab-content active">
+            <div class="card">
+                <h2>How can I help you navigate?</h2>
+                <p class="help-text">Describe what you're trying to do, and I'll give you step-by-step instructions based on what I've learned from support sessions.</p>
+                <div class="query-form">
+                    <select id="guidance-profile" class="select">
+                        <option value="">All software</option>
+                    </select>
+                    <textarea id="guidance-query" placeholder="e.g., How do I change a fee for Substitution of Trustee?" rows="3"></textarea>
+                    <button id="guidance-submit" class="btn btn-primary">Get Instructions</button>
+                </div>
+            </div>
+            <div id="guidance-result" class="card hidden">
+                <div class="result-header">
+                    <h3>Here's how:</h3>
+                    <span id="guidance-confidence" class="badge"></span>
+                </div>
+                <div id="guidance-text" class="guidance-text"></div>
+                <div class="feedback-section">
+                    <p>Was this helpful?</p>
+                    <div class="star-rating" id="star-rating">
+                        <span class="star" data-rating="1">&#9733;</span>
+                        <span class="star" data-rating="2">&#9733;</span>
+                        <span class="star" data-rating="3">&#9733;</span>
+                        <span class="star" data-rating="4">&#9733;</span>
+                        <span class="star" data-rating="5">&#9733;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sessions Tab -->
+        <section id="sessions" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Support Sessions</h2>
+                    <button id="new-session-btn" class="btn btn-primary">New Session</button>
+                </div>
+            </div>
+            <div id="new-session-form" class="card hidden">
+                <h3>Start New Session</h3>
+                <input type="text" id="session-title" placeholder="Session title (optional)" class="input">
+                <select id="session-profile" class="select">
+                    <option value="">No profile</option>
+                </select>
+                <button id="create-session-btn" class="btn btn-primary">Start Recording</button>
+            </div>
+            <div id="sessions-list" class="list"></div>
+            <!-- Session detail panel -->
+            <div id="session-detail" class="card hidden">
+                <div class="card-header">
+                    <h3 id="session-detail-title">Session Detail</h3>
+                    <span id="session-detail-status" class="badge"></span>
+                </div>
+                <div class="session-stats" id="session-stats"></div>
+                <div class="session-actions">
+                    <h4>Upload Data</h4>
+                    <div class="upload-section">
+                        <label>Screenshot:</label>
+                        <input type="file" id="screenshot-upload" accept="image/*">
+                        <button id="upload-screenshot-btn" class="btn">Upload Screenshot</button>
+                    </div>
+                    <div class="upload-section">
+                        <label>Conversation transcript:</label>
+                        <textarea id="transcript-input" placeholder="Paste conversation transcript here..." rows="5"></textarea>
+                        <button id="upload-transcript-btn" class="btn">Upload Transcript</button>
+                    </div>
+                    <button id="complete-session-btn" class="btn btn-success">Complete & Process Session</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Knowledge Base Tab -->
+        <section id="knowledge" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Learned Navigation Paths</h2>
+                    <div id="knowledge-stats" class="stats"></div>
+                </div>
+                <div class="search-form">
+                    <input type="text" id="knowledge-search" placeholder="Search knowledge base..." class="input">
+                    <button id="knowledge-search-btn" class="btn">Search</button>
+                </div>
+            </div>
+            <div id="knowledge-list" class="list"></div>
+        </section>
+
+        <!-- Profiles Tab -->
+        <section id="profiles" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Software Profiles</h2>
+                    <button id="new-profile-btn" class="btn btn-primary">New Profile</button>
+                </div>
+            </div>
+            <div id="new-profile-form" class="card hidden">
+                <h3>Create Software Profile</h3>
+                <input type="text" id="profile-name" placeholder="Software name" class="input">
+                <input type="text" id="profile-description" placeholder="Description" class="input">
+                <button id="create-profile-btn" class="btn btn-primary">Create</button>
+            </div>
+            <div id="profiles-list" class="list"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Tirithel v0.1.0 &mdash; Learning from every support session</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
