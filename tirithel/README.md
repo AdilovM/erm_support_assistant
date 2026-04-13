@@ -72,6 +72,35 @@ tirithel/
 | GET | `/api/v1/knowledge/paths` | Browse learned paths |
 | POST | `/api/v1/knowledge/search` | Semantic search |
 
+## Desktop Agent
+
+Tirithel includes a desktop agent that runs in your system tray during support sessions. It automatically captures screenshots and tracks mouse/keyboard events, sending everything to the web API.
+
+```bash
+# Start with system tray icon
+python -m tirithel.agent
+
+# Or run in CLI mode
+python -m tirithel.agent --cli
+
+# Custom API server and capture interval
+python -m tirithel.agent --api-url http://server:8000 --interval 5
+```
+
+**How it works:**
+1. Start the web API server (`uvicorn tirithel.main:app`)
+2. Launch the desktop agent (`python -m tirithel.agent`)
+3. Click "Start Recording" in the tray icon (or type `start` in CLI)
+4. Conduct your support session via Bomgar or any remote tool
+5. Click "Stop Recording" when done - the session is automatically processed
+
+The agent captures screenshots every 3 seconds (configurable), detects mouse clicks and keyboard input, and uploads everything to the API for OCR analysis and knowledge extraction.
+
+**Extra dependencies for the agent:**
+```bash
+pip install pynput pystray
+```
+
 ## Example
 
 **Input**: Support agent helps user change a fee schedule, Tirithel observes.
