@@ -76,7 +76,7 @@ class TestNavigationPathBuilder:
         assert "fee" in merged.tags
         assert "recording" in merged.tags
         # Confidence should increase
-        assert merged.confidence == 0.85  # 0.8 + 0.05
+        assert abs(merged.confidence - 0.85) < 1e-9  # 0.8 + 0.05
         # Use longer summary
         assert "recording" in merged.issue_summary
 

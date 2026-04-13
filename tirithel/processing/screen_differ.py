@@ -86,7 +86,7 @@ class ScreenDiffer:
 
         # Detect if new UI elements appeared (large concentrated change)
         new_elements = any(
-            r.change_intensity > 0.5 and r.width > 100 and r.height > 50
+            r.change_intensity > 0.5 and r.width >= 100 and r.height >= 50
             for r in changed_regions
         )
 

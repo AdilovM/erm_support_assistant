@@ -138,10 +138,11 @@ class ConversationSegmenter:
         """Heuristic guess of segment type (fallback when LLM is unavailable)."""
         lower = text.lower()
 
-        if any(kw in lower for kw in self.INSTRUCTION_KEYWORDS):
-            return "action_instruction"
-        elif any(kw in lower for kw in self.ISSUE_KEYWORDS):
+        # Check issue keywords first (they indicate a problem to solve)
+        if any(kw in lower for kw in self.ISSUE_KEYWORDS):
             return "issue_description"
+        elif any(kw in lower for kw in self.INSTRUCTION_KEYWORDS):
+            return "action_instruction"
         elif lower.startswith(("yes", "no", "that's", "perfect", "thank", "got it")):
             return "confirmation"
         elif "?" in text:
